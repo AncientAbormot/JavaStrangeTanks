@@ -129,21 +129,26 @@ public class Player extends Entity {
 
     }
 
+    public float getScale() {
+        return this.scale;
+    }
+    public float getX() {
+        return this.x;
+    }
+    public float getY() {
+        return this.y;
+    }
+    public float getSPRSCL() {
+        return this.SPRITE_SCALE;
+    }
+    public int getID(){
+      return this.ID;
+    }
+
     @Override
     public void render(Graphics2D g) {
         spriteMap.get(heading).render(g, x, y);
     }
 
-    public float getX(){
-        return this.x;
-    }
-    public float getY(){
-        return this.y;
-    }
-    public float getScale(){
-        return this.scale;
-    }
-    public float getSpriteScale(){ //SPRTSCL_IEAE
-        return this.SPRITE_SCALE;
-    }
+
 }
