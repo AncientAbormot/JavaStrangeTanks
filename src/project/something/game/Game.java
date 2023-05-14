@@ -42,7 +42,7 @@ public class Game implements Runnable {
     private Bullet bullet;
     private int tanks;
 
-    public ArrayList<Player> tankslist = new ArrayList<>();
+    public static ArrayList<Player> tankslist = new ArrayList<>();
 
     public Game(int tanks) {
         this.tanks = tanks;
@@ -58,19 +58,19 @@ public class Game implements Runnable {
         TextureAtlas atlastank4 = new TextureAtlas(WT_T);
         TextureAtlas atlasblocks = new TextureAtlas(B_T);
 
-        lvl = new Level(atlasblocks);
-        player = new Player(300, 300, 1, 1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT,1, atlastank1);
+        lvl = new Level(atlasblocks,"level1");
+        player = new Player(300, 300, 1, 1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT,0, atlastank1);
         tankslist.add(player);
         if (tanks > 1) {
-            player2 = new Player(300, 150, 1, 1,KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D,2, atlastank2);
+            player2 = new Player(300, 150, 1, 1,KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D,1, atlastank2);
             tankslist.add(player2);
         }
         if (tanks > 2) {
-            player3 = new Player(150, 150, 1, 1, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L,3, atlastank3);
+            player3 = new Player(150, 150, 1, 1, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L,2, atlastank3);
             tankslist.add(player3);
         }
         if (tanks > 3) {
-            player4 = new Player(150, 300, 1, 1, KeyEvent.VK_NUMPAD8, KeyEvent.VK_NUMPAD5, KeyEvent.VK_NUMPAD4, KeyEvent.VK_NUMPAD6,4, atlastank4);
+            player4 = new Player(150, 300, 1, 1, KeyEvent.VK_NUMPAD8, KeyEvent.VK_NUMPAD5, KeyEvent.VK_NUMPAD4, KeyEvent.VK_NUMPAD6,3, atlastank4);
             tankslist.add(player4);
         }
         /*public float getX(){
@@ -213,39 +213,70 @@ public class Game implements Runnable {
         private void cleanUp() {
         Display.destroy();
     }
-    public float getScale(int id) {
-        for (int i=0;i<tankslist.size();i++){
-            if (tankslist.get(i).getID()==id){
-                return tankslist.get(i).getScale();
-            }
+    public static float getScale(int id) {
+        if (tankslist.get(id) != null) {
+            return tankslist.get(id).getScale();
         }
         return -1f;
     }
-    public float getX(int id) {
-        for (int i=0;i<tankslist.size();i++){
-            if (tankslist.get(i).getID()==id){
-                return tankslist.get(i).getX();
-            }
+    public static float getX(int id) {
+        if (tankslist.get(id) != null) {
+            return tankslist.get(id).getX();
         }
         return -1f;
     }
-    public float getY(int id) {
-        for (int i=0;i<tankslist.size();i++){
-            if (tankslist.get(i).getID()==id){
-                return tankslist.get(i).getY();
-            }
+    public static float getY(int id) {
+       if (tankslist.get(id) != null) {
+           return tankslist.get(id).getY();
+       }
+        return -1f;
+    }
+    public static float getSPRSCL(int id) {
+        if (tankslist.get(id) != null) {
+            return tankslist.get(id).getSPRSCL();
         }
         return -1f;
     }
-    public float getSPRSCL(int id) {
-        for (int i=0;i<tankslist.size();i++){
-            if (tankslist.get(i).getID()==id){
-                return tankslist.get(i).getSPRSCL();
-            }
+    public static boolean DoesCollide(int ID1, float newX,float newY){
+        boolean DoesCollide = false;
+        int ID2;
+        for (int i=0; i< tankslist.size(); i++) {
+           if (i != ID1){
+               ID2 = i;
+            if (
+                    newX + getSPRSCL(ID1) * getScale(ID1) >= getX(ID2) &&
+                            newX <= getX(ID2) + getSPRSCL(ID2) * getScale(ID2) &&
+                            newY + getSPRSCL(ID1) * getScale(ID1) >= getY(ID2) &&
+                            newY <= getY(ID2) + getSPRSCL(ID2) * getScale(ID2)
+            ){DoesCollide = true;}
+           }
         }
-        return -1f;
-    }
 
+        return DoesCollide;
+    }
+    public static boolean AllowMove(float newX, float newY,int Id1){
+        boolean can = true;
+        int ID = Id1-0;
+        if (newX < 0) {
+            //newX = 0;
+            can = false;
+        } else if (newX >= Game.WIDTH - tankslist.get(ID).getSPRSCL() * tankslist.get(ID).getScale()) {
+            //newX = Game.WIDTH - SPRITE_SCALE * this.scale;
+            can = false;
+        }
+
+        if (newY < 0) {
+            //newY = 0;
+            can = false;
+        } else if (newY >= Game.HEIGHT - tankslist.get(ID).getSPRSCL() * tankslist.get(ID).getScale()) {
+            //newY = Game.HEIGHT - SPRITE_SCALE * this.scale;
+            can = false;
+        }
+        if (DoesCollide(ID,newX,newY)) {
+          can = false;
+        }
+        return can;
+    }
     public void setBullet(Bullet bullet) {
         this.bullet = bullet;
     }

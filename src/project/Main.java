@@ -76,6 +76,7 @@ public class Main extends javax.swing.JFrame {
         } else if (Integer.parseInt(jTextField1.getText()) > 4) {
             return;
         }
+
         new Game(Integer.parseInt(jTextField1.getText())).start();
         m.setVisible(false);
         } catch (Exception e) {

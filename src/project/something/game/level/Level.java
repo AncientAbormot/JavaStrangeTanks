@@ -5,6 +5,7 @@ import project.something.graphics.TextureAtlas;
 import project.something.utils.Utils;
 
 import java.awt.*;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class Level {
     private Integer[][] tileMap;
     private Map<TileType, Tile> tiles;
 
-    public Level(TextureAtlas B_T) {
+    public Level(TextureAtlas B_T, String levelid) {
         tileMap = new Integer[TILES_IN_WIDTH][TILES_IN_HEIGHT];
         tiles = new HashMap<TileType, Tile>();
         tiles.put(TileType.BRICK, new Tile(B_T.cut(0 * TILE_SCALE, 0 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.BRICK));
@@ -31,8 +32,13 @@ public class Level {
         tiles.put(TileType.GRASS, new Tile(B_T.cut(1 * TILE_SCALE, 1 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.GRASS));
         tiles.put(TileType.ICE, new Tile(B_T.cut(0 * TILE_SCALE, 2 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.ICE));
         tiles.put(TileType.EMPTY, new Tile(B_T.cut(3 * TILE_SCALE, 2 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.EMPTY));
-
-        tileMap = Utils.lvlParser("res\\leveR");
+        String wdir =System.getProperty("user. dir");
+        tileMap = Utils.lvlParser("res\\leveldir\\"+levelid);
+        File tmpDir = new File(wdir+"res\\leveldir\\"+levelid);
+        boolean exists = tmpDir.isFile();
+        if (exists){
+            tileMap = Utils.lvlParser("res\\leveldir\\leveltest");
+        }
     }
     public void update() {
 

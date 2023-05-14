@@ -1,5 +1,6 @@
 package project.something.game;
 
+import project.Main;
 import project.something.IO.Input;
 import project.something.game.Entity;
 import project.something.game.EntityType;
@@ -104,27 +105,10 @@ public class Player extends Entity {
                 goin = true;
             }
         }
-        boolean can = true;
-        if (newX < 0) {
-            //newX = 0;
-            can = false;
-        } else if (newX >= Game.WIDTH - SPRITE_SCALE * this.scale) {
-            //newX = Game.WIDTH - SPRITE_SCALE * this.scale;
-            can = false;
-        }
 
-        if (newY < 0) {
-            //newY = 0;
-            can = false;
-        } else if (newY >= Game.HEIGHT - SPRITE_SCALE * this.scale) {
-            //newY = Game.HEIGHT - SPRITE_SCALE * this.scale;
-            can = false;
-        }
-        if (can && goin) {
+        if (Game.AllowMove(newX,newY,this.ID) && goin) {
             x = newX;
             y = newY;
-            System.out.println(x + " " + y);
-            System.out.println((x + SPRITE_SCALE * this.scale) + " " + (y + SPRITE_SCALE * this.scale));
         }
 
     }
