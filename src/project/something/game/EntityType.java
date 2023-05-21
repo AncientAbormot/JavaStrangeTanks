@@ -1,6 +1,9 @@
 package project.something.game;
 
+
+
 public enum EntityType {
 
-    Player;
+    Player,
+    Bullet;
 }

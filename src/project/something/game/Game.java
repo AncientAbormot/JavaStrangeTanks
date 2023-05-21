@@ -39,10 +39,11 @@ public class Game implements Runnable {
     private Player player2;
     private Player player3;
     private Player player4;
-    private Bullet bullet;
+    //private Bullet bullet;
     private int tanks;
 
     public static ArrayList<Player> tankslist = new ArrayList<>();
+    public static ArrayList<Bullet> objlist = new ArrayList<>();
 
     public Game(int tanks) {
         this.tanks = tanks;
@@ -129,10 +130,10 @@ public class Game implements Runnable {
         if (tanks > 3) {
             player4.update(input);
         }*/
-        boolean bull = !(bullet == null);
-        if (bull) {
-            bullet.update(input);
-        }
+       // boolean bull = !(bullet == null);
+        //if (bull) {
+          //  bullet.update(input);
+       // }
 
         lvl.update();
     }
@@ -236,7 +237,32 @@ public class Game implements Runnable {
             return tankslist.get(id).getSPRSCL();
         }
         return -1f;
+    }
+
+    public static float getBulSPRSCL(int id) {
+        if (objlist.get(id) != null) {
+            return objlist.get(id).getSPRSCL();
+        }
+        return -1f;
     }//gallery nigga
+    public static float getBulScale(int id) {
+        if (objlist.get(id) != null) {
+            return objlist.get(id).getScale();
+        }
+        return -1f;
+    }
+    public static float getBulX(int id) {
+        if (objlist.get(id) != null) {
+            return objlist.get(id).getX();
+        }
+        return -1f;
+    }
+    public static float getBulY(int id) {
+        if (objlist.get(id) != null) {
+            return objlist.get(id).getY();
+        }
+        return -1f;
+    }
     public static boolean DoesCollide(int ID1, float newX,float newY){
         boolean DoesCollide = false;
         int ID2;
@@ -277,7 +303,24 @@ public class Game implements Runnable {
         }
         return can;
     }
-    public void setBullet(Bullet bullet) {
-        this.bullet = bullet;
+    public static boolean DoesBulletCollide(int ID1, float newX,float newY){
+        boolean DoesCollide = false;
+        int ID2;
+        for (int i=0; i< tankslist.size(); i++) {
+            if (i != ID1){
+                ID2 = i;
+                if (
+                        newX + getSPRSCL(ID1) * getScale(ID1) >= getX(ID2) &&
+                                newX <= getX(ID2) + getSPRSCL(ID2) * getScale(ID2) &&
+                                newY + getSPRSCL(ID1) * getScale(ID1) >= getY(ID2) &&
+                                newY <= getY(ID2) + getSPRSCL(ID2) * getScale(ID2)
+                ){DoesCollide = true;}
+            }
+        }
+        return DoesCollide;
     }
+
+    //public void setBullet(Bullet bullet) {
+        //this.bullet = bullet;
+   // }
 }
