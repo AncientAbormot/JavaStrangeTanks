@@ -236,7 +236,7 @@ public class Game implements Runnable {
             return tankslist.get(id).getSPRSCL();
         }
         return -1f;
-    }//gallery
+    }//gallery bigga
     public static boolean DoesCollide(int ID1, float newX,float newY){
         boolean DoesCollide = false;
         int ID2;
