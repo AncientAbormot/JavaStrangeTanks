@@ -236,7 +236,7 @@ public class Game implements Runnable {
         if (tankslist.get(id) != null) {
             return tankslist.get(id).getSPRSCL();
         }
-        return -1f;
+        return -1f;//MRBEAST
     }
 
     public static float getBulSPRSCL(int id) {
