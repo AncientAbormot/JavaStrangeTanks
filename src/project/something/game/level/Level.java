@@ -27,10 +27,11 @@ public class Level {
         tileMap = new Integer[TILES_IN_WIDTH][TILES_IN_HEIGHT];
         tiles = new HashMap<TileType, Tile>();
         tiles.put(TileType.BRICK, new Tile(B_T.cut(0 * TILE_SCALE, 0 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.BRICK));
-        tiles.put(TileType.METAL, new Tile(B_T.cut(0 * TILE_SCALE, 1 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.METAL));
+        tiles.put(TileType.METAL, new Tile(B_T.cut(2 * TILE_SCALE, 1 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.METAL));
         tiles.put(TileType.WATER, new Tile(B_T.cut(1 * TILE_SCALE, 2 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.WATER));
         tiles.put(TileType.GRASS, new Tile(B_T.cut(1 * TILE_SCALE, 1 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.GRASS));
-        tiles.put(TileType.ICE, new Tile(B_T.cut(0 * TILE_SCALE, 2 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.ICE));
+        tiles.put(TileType.BARREL, new Tile(B_T.cut(0 * TILE_SCALE, 2 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.BARREL));
+        tiles.put(TileType.BRIDGE, new Tile(B_T.cut(0 * TILE_SCALE, 1 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.BARREL));
         tiles.put(TileType.EMPTY, new Tile(B_T.cut(3 * TILE_SCALE, 2 * TILE_SCALE, TILE_SCALE, TILE_SCALE) , TILE_IN_GAME_SCALE, TileType.EMPTY));
         String wdir =System.getProperty("user. dir");
         tileMap = Utils.lvlParser("res\\leveldir\\"+levelid);

@@ -1,5 +1,6 @@
 package project.something.game;
 
+import project.Main;
 import project.something.IO.Input;
 import project.something.display.Display;
 import project.something.game.bullet.Bullet;
@@ -7,9 +8,13 @@ import project.something.game.level.Level;
 import project.something.graphics.TextureAtlas;
 import project.something.utils.Time;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Game implements Runnable {
 
@@ -26,8 +31,10 @@ public class Game implements Runnable {
     public static final String RT_T = "tanks\\red_tank.png";
     public static final String GT_T = "tanks\\green_tank.png";
     public static final String WT_T = "tanks\\white_tank.png";
+    public static final String Enemy = "tanks\\enemy.png";
     public static final String B_T = "map\\blocks.png";
     public static final String BUL_T = "bullets\\n_bullets.png";
+
 
     private boolean running;
     private Thread gameThread;
@@ -58,20 +65,21 @@ public class Game implements Runnable {
         TextureAtlas atlastank3 = new TextureAtlas(RT_T);
         TextureAtlas atlastank4 = new TextureAtlas(WT_T);
         TextureAtlas atlasblocks = new TextureAtlas(B_T);
+        TextureAtlas atlasbullet = new TextureAtlas(BUL_T);
 
-        lvl = new Level(atlasblocks,"level1");
-        player = new Player(300, 300, 1, 1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT,0, atlastank1);
+        lvl = new Level(atlasblocks,"leveR");
+        player = new Player(300, 300,300, 300, 1, 1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT,KeyEvent.VK_NUMPAD0,0, atlastank1);
         tankslist.add(player);
         if (tanks > 1) {
-            player2 = new Player(300, 150, 1, 1,KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D,1, atlastank2);
+            player2 = new Player(300, 150,300, 150, 1, 1,KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D,KeyEvent.VK_Q,1, atlastank2);
             tankslist.add(player2);
         }
         if (tanks > 2) {
-            player3 = new Player(150, 150, 1, 1, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L,2, atlastank3);
+            player3 = new Player(150, 150,150, 150, 1, 1, KeyEvent.VK_I, KeyEvent.VK_K, KeyEvent.VK_J, KeyEvent.VK_L,KeyEvent.VK_U,2, atlastank3);
             tankslist.add(player3);
         }
         if (tanks > 3) {
-            player4 = new Player(150, 300, 1, 1, KeyEvent.VK_NUMPAD8, KeyEvent.VK_NUMPAD5, KeyEvent.VK_NUMPAD4, KeyEvent.VK_NUMPAD6,3, atlastank4);
+            player4 = new Player(150, 300,150, 300, 1, 1, KeyEvent.VK_NUMPAD8, KeyEvent.VK_NUMPAD5, KeyEvent.VK_NUMPAD4, KeyEvent.VK_NUMPAD6,KeyEvent.VK_NUMPAD7,3, atlastank4);
             tankslist.add(player4);
         }
         /*public float getX(){
@@ -96,6 +104,24 @@ public class Game implements Runnable {
         running = true;
         gameThread = new Thread(this);
         gameThread.start();
+        Thread Cinput = new Thread(new Runnable() {
+            public void run() {
+                Scanner in = new Scanner(System.in);
+                while (true){
+                    String cmd = in.nextLine();
+                    String beg = cmd.substring(0,WhereSpace(cmd));
+                    if (beg.equalsIgnoreCase("move")){
+                       String arg1 = cmd.substring(WhereSpace(cmd)+1);
+                       if (WhereSpace(arg1) != -1){
+                           arg1 = cmd.substring(WhereSpace(cmd)+1,WhereSpace(arg1));
+                       }
+                        System.out.println(arg1);
+                    }
+                }
+
+            }
+        });
+
 
     }
 
@@ -116,9 +142,12 @@ public class Game implements Runnable {
 
     }
 
-    private void update() {
+    private void update() throws InterruptedException {
         for(int i =0; i<tankslist.size();i++){
             tankslist.get(i).update(input);
+        }
+        for(int i =0; i<objlist.size();i++){
+            objlist.get(i).update(input);
         }
        /* player.update(input);
         if (tanks > 1) {
@@ -143,6 +172,9 @@ public class Game implements Runnable {
         lvl.render(graphics);
         for(int i =0; i<tankslist.size();i++){
             tankslist.get(i).render(graphics);
+        }
+        for(int i =0; i<objlist.size();i++){
+            objlist.get(i).render(graphics);
         }
        /* player.render(graphics);
         if (tanks > 1) {
@@ -178,7 +210,11 @@ public class Game implements Runnable {
             boolean render = false;
             delta += (elapsedTime / UPDATE_INTERVAL);
             while (delta > 1) {
-                update();
+                try {
+                    update();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 upd++;
                 delta--;
                 if (render) {
@@ -263,22 +299,107 @@ public class Game implements Runnable {
         }
         return -1f;
     }
+    public static void createBullet(float x, float y, float speed, float scale, int ID, Player.Heading heading){
+        TextureAtlas atlasbullet = new TextureAtlas(BUL_T);
+        objlist.add(new Bullet(x,y,speed,scale,ParseHeading(heading),atlasbullet,ID,objlist.size()));
+    }
+    public static void DeleteBullet(int Index){
+        objlist.remove(Index);
+    }
+    public static Bullet.Heading ParseHeading(Player.Heading heading){
+        Bullet.Heading bulh;
+        bulh = Bullet.Heading.NORTH;
+        if (heading == Player.Heading.NORTH) {
+            bulh = Bullet.Heading.NORTH;
+        } else if (heading == Player.Heading.EAST) {
+            bulh = Bullet.Heading.EAST;
+        } else if (heading == Player.Heading.SOUTH) {
+            bulh = Bullet.Heading.SOUTH;
+        } else if (heading == Player.Heading.WEST) {
+            bulh = Bullet.Heading.WEST;
+        }
+        return bulh;
+    }
+    public static synchronized void playSound(final String url) {
+        new Thread(new Runnable() {
+            // The wrapper thread is unnecessary, unless it blocks on the
+            // Clip finishing; see comments.
+            public void run() {
+                try {
+                    Clip clip = AudioSystem.getClip();
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+                            Main.class.getResourceAsStream("/path/to/sounds/" + url));
+                    clip.open(inputStream);
+                    clip.start();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }).start();
+    }
+    public static boolean DoesBulCollide(int ID,int ID1,float newX,float newY){
+        boolean DoesCollide = false;
+        int ID2;
+        for (int i=0; i< tankslist.size(); i++) {
+           if (i != ID){
+               ID2 = i;
+            if (
+                    newX + getBulSPRSCL(ID1) * getBulScale(ID1) >= getX(ID2) &&
+                            newX <= getX(ID2) + getSPRSCL(ID2) * getScale(ID2) &&
+                            newY + getBulSPRSCL(ID1) * getBulScale(ID1) >= getY(ID2) &&
+                            newY <= getY(ID2) + getSPRSCL(ID2) * getScale(ID2)
+            ){DoesCollide = true; tankslist.get(ID2).die();}
+           }
+        }
+
+
+        return DoesCollide;
+    }
+    public static int WithWhoBulCollide(int ID,int ID1,float newX,float newY){
+        int CollideWith = -1;
+        int ID2;
+        for (int i=0; i< tankslist.size(); i++) {
+            if (i != ID){
+                ID2 = i;
+                if (    CollideWith == -1 &&
+                        newX + getBulSPRSCL(ID1) * getBulScale(ID1) >= getX(ID2) &&
+                                newX <= getX(ID2) + getSPRSCL(ID2) * getScale(ID2) &&
+                                newY + getBulSPRSCL(ID1) * getBulScale(ID1) >= getY(ID2) &&
+                                newY <= getY(ID2) + getSPRSCL(ID2) * getScale(ID2)
+                ){CollideWith = ID2;}
+            }
+        }
+
+
+        return CollideWith;
+    }
     public static boolean DoesCollide(int ID1, float newX,float newY){
         boolean DoesCollide = false;
         int ID2;
         for (int i=0; i< tankslist.size(); i++) {
-           if (i != ID1){
-               ID2 = i;
-            if (
-                    newX + getSPRSCL(ID1) * getScale(ID1) >= getX(ID2) &&
-                            newX <= getX(ID2) + getSPRSCL(ID2) * getScale(ID2) &&
-                            newY + getSPRSCL(ID1) * getScale(ID1) >= getY(ID2) &&
-                            newY <= getY(ID2) + getSPRSCL(ID2) * getScale(ID2)
-            ){DoesCollide = true;}
-           }
+            if (i != ID1){
+                ID2 = i;
+                if (
+                        newX + getSPRSCL(ID1) * getScale(ID1) >= getX(ID2) &&
+                                newX <= getX(ID2) + getSPRSCL(ID2) * getScale(ID2) &&
+                                newY + getSPRSCL(ID1) * getScale(ID1) >= getY(ID2) &&
+                                newY <= getY(ID2) + getSPRSCL(ID2) * getScale(ID2)
+                ){DoesCollide = true;}
+            }
         }
 
         return DoesCollide;
+    }
+    public static int WhereSpace(final String testCode){
+        int wh = -1;
+        if(testCode != null){
+            for(int i = 0; i < testCode.length(); i++){
+                if(Character.isWhitespace(testCode.charAt(i)) && wh == -1){
+                    wh = i;
+                }
+            }
+        }
+        return wh;
     }
     public static boolean AllowMove(float newX, float newY,int Id1){
         boolean can = true;
@@ -318,6 +439,14 @@ public class Game implements Runnable {
             }
         }
         return DoesCollide;
+    }
+    public boolean isStringFloat(String s) {
+        try {
+            Float.parseFloat(s);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
     }
 
     //public void setBullet(Bullet bullet) {

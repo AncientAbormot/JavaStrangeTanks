@@ -1,7 +1,7 @@
 package project.something.game.level;
 
 public enum TileType {
-    EMPTY(0), BRICK(1), METAL(2), WATER(3), GRASS(4), ICE(5);
+    EMPTY(0), BRICK(1), METAL(2), WATER(3), GRASS(4), BARREL(5), BRIDGE(6);
 
     private int n;
 
@@ -22,7 +22,9 @@ public enum TileType {
             case 4:
                 return GRASS;
             case 5:
-                return ICE;
+                return BARREL;
+            case 6:
+                return BRIDGE;
             default:
                 return EMPTY;
         }

@@ -19,7 +19,7 @@ public class Player extends Entity {
     public static final int	SPRITE_SCALE		= 16;
     public static final int	SPRITES_PER_HEADING	= 2;
 
-    enum Heading {
+    public enum Heading {
         NORTH(0 * SPRITE_SCALE, 0 * SPRITE_SCALE, 3 * SPRITE_SCALE, 1 * SPRITE_SCALE),
         EAST(6 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE),
         SOUTH(4 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE),
@@ -34,7 +34,7 @@ public class Player extends Entity {
             this.h = h;
         }
 
-        protected BufferedImage texture(TextureAtlas YT_T) {
+        public BufferedImage texture(TextureAtlas YT_T) {
             return YT_T.cut(x, y, w, h);
         }
     }
@@ -48,19 +48,27 @@ public class Player extends Entity {
     private int DOWN;
     private int LEFT;
     private int RIGHT;
+    private int SHOOT;
     private int ID;
+    private int pewcd;
+    private float stx;
+    private float sty;
+    private int deathwait;
 
-    public Player(float x, float y, float scale, float speed, int UP , int DOWN, int LEFT , int RIGHT, int ID  , TextureAtlas atlas) {
+    public Player(float x, float y,float stx,float sty, float scale, float speed, int UP , int DOWN, int LEFT , int RIGHT, int SHOOT,int ID  , TextureAtlas atlas) {
         super(EntityType.Player, x, y);
         this.UP = UP;
         this.DOWN = DOWN;
         this.LEFT = LEFT;
         this.RIGHT = RIGHT;
+        this.SHOOT = SHOOT;
         this.ID = ID;
         heading = Heading.NORTH;
         spriteMap = new HashMap<Heading, Sprite>();
         this.scale = scale*2;
         this.speed = speed*3;
+        this.stx = stx;
+        this.sty = sty;
 
         for (Heading h : Heading.values()) {
             SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
@@ -72,7 +80,12 @@ public class Player extends Entity {
 
     @Override
     public void update(Input input) {
-
+        pewcd -= 1;
+        deathwait -= 1;
+        if (deathwait == 0){
+            x = stx;
+            y = sty;
+        }
         float newX = x;
         float newY = y;
         boolean goin = false;
@@ -105,6 +118,13 @@ public class Player extends Entity {
                 goin = true;
             }
         }
+        if (input.getKey(SHOOT)){
+            if(pewcd<1){
+                Game.createBullet(x+SPRITE_SCALE*(scale/2),y+SPRITE_SCALE*(scale/2),1,2,this.ID,heading);
+                pewcd = 60;
+            }
+
+        }
 
         if (Game.AllowMove(newX,newY,this.ID) && goin) {
             x = newX;
@@ -128,6 +148,13 @@ public class Player extends Entity {
     public int getID(){
       return this.ID;
     }
+    public synchronized void die(){
+        x = -200;
+        y = -200;
+        deathwait = 60;
+
+    }
+
 
     @Override
     public void render(Graphics2D g) {

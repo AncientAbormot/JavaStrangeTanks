@@ -19,14 +19,13 @@ public class Bullet extends Entity {
 
     public static final int SPRITE_SCALE = 4;
     public static final int SPRITES_PER_HEADING = 2;
-
-    enum Heading {
+    public enum Heading {
         NORTH(0 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE),
         EAST(6 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE),
         SOUTH(4 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE),
         WEST(2 * SPRITE_SCALE, 0 * SPRITE_SCALE, 1 * SPRITE_SCALE, 1 * SPRITE_SCALE);
 
-        private int x, y, h, w;
+        private int	x, y, h, w;
 
         Heading(int x, int y, int h, int w) {
             this.x = x;
@@ -35,26 +34,27 @@ public class Bullet extends Entity {
             this.h = h;
         }
 
-        protected BufferedImage texture(TextureAtlas atlas) {
-            return atlas.cut(x, y, w, h);
+        public BufferedImage texture(TextureAtlas YT_T) {
+            return YT_T.cut(x, y, w, h);
         }
     }
-
     private Bullet.Heading heading;
     private Map<Bullet.Heading, Sprite> spriteMap;
     private float scale;
     private float speed;
 
     private int ID;
+    private int index;
 
-    public Bullet(float x, float y, float scale, float speed, Heading heading, int ID, TextureAtlas atlas) {
+    public Bullet(float x, float y, float scale, float speed, Bullet.Heading heading, TextureAtlas atlas,int ID,int index) {
         super(EntityType.Bullet, x, y);
-        this.ID = ID;
         this.heading = heading;
         spriteMap = new HashMap<Bullet.Heading, Sprite>();
         this.scale = scale * 2;
         this.speed = speed * 3;
-        for (Heading h : Heading.values()) {
+        this.ID = ID;
+        this.index = index;
+        for (Bullet.Heading h : Bullet.Heading.values()) {
             SpriteSheet sheet = new SpriteSheet(h.texture(atlas), SPRITES_PER_HEADING, SPRITE_SCALE);
             Sprite sprite = new Sprite(sheet, this.scale);
             spriteMap.put(h, sprite);
@@ -62,25 +62,31 @@ public class Bullet extends Entity {
     }
 
     @Override
-    public void update(Input input) {
+    public void update(Input input) throws InterruptedException {
 
         float newX = x;
         float newY = y;
 
         //Стрелочки
-        if (heading == Heading.NORTH) {
+        if (heading == Bullet.Heading.NORTH) {
             newY -= speed;
-        } else if (heading == Heading.EAST) {
+        } else if (heading == Bullet.Heading.EAST) {
             newX += speed;
-        } else if (heading == Heading.SOUTH) {
+        } else if (heading == Bullet.Heading.SOUTH) {
             newY += speed;
-        } else if (heading == Heading.WEST) {
+        } else if (heading == Bullet.Heading.WEST) {
             newX -= speed;
         }
 
-        if (Game.AllowMove(newX, newY, this.ID)) {
+        if (true) {
             x = newX;
             y = newY;
+        }
+        int hit = Game.WithWhoBulCollide(ID,index,newX,newY);
+        if(hit != -1){
+            Game.tankslist.get(hit).die();
+            System.out.println(ID +" Hit "+ hit);
+            Game.DeleteBullet(this.index);
         }
 
     }

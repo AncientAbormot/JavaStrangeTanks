@@ -18,7 +18,7 @@ public abstract class Entity {
         this.y = y;
     }
 
-    public abstract void update(Input input);
+    public abstract void update(Input input) throws InterruptedException;
 
     public abstract void render(Graphics2D g);
 
